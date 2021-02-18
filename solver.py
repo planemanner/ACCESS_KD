@@ -26,7 +26,7 @@ class grad_anneal(nn.Module):
         self.Gaussian_generator = torch.randn(self.batch_size, self.feature_size)
         self.L2_GRAD_NORM, _Gradient = self._grad(outputs=outputs, inputs=inputs)
         self.approx_constraint = self._constraint(Gradient=_Gradient, rv=self.Gaussian_generator)
-        self.cosin_decay = math.cos(math.pi*0.5* cur_iter/self.total_iter)
+        self.cosin_decay = torch.tensor(math.cos(math.pi*0.5* cur_iter/self.total_iter), dtype=torch.float)
         return (self.alpha * self.approx_constraint + 0.5 * self.gamma * self.L2_GRAD_NORM) * self.cosin_decay
 
     def _grad(self, outputs, inputs):
