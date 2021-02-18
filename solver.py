@@ -27,7 +27,8 @@ class grad_anneal(nn.Module):
         self.L2_GRAD_NORM, _Gradient = self._grad(outputs=outputs, inputs=inputs)
         self.approx_constraint = self._constraint(Gradient=_Gradient, rv=self.Gaussian_generator)
         self.cosin_decay = torch.tensor(math.cos(math.pi*0.5* cur_iter/self.total_iter), dtype=torch.float)
-        return (self.alpha * self.approx_constraint + 0.5 * self.gamma * self.L2_GRAD_NORM) * self.cosin_decay
+
+        return (self.alpha * self.approx_constraint + 0.5 * self.gamma * self.L2_GRAD_NORM) * (self.cosin_decay**2)
 
     def _grad(self, outputs, inputs):
         Gradient = grad(outputs=outputs,
@@ -133,6 +134,7 @@ class ZeroShotKTSolver(object):
                 
                 generator_loss = self.KT_loss_generator(student_logits, teacher_logits)
                 reg_loss = self.annealator(outputs=generator_loss, inputs=x_pseudo, cur_iter=self.n_pseudo_batches)
+                
                 total_loss = generator_loss + reg_loss
 
                 total_loss.backward()
